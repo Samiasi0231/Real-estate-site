@@ -1,0 +1,77 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model user {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String   @unique
+  username  String   @unique
+  password  String
+  avatar    String ? // Optional field for user avatar
+  posts     post[]   // One-to-many relation with posts
+  createdAt DateTime @default(now())
+  savedPost savedPost[]
+}
+
+model post {
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  title       String      
+  price       Int
+  images      String[]    // Array of image URLs
+  address     String
+  city        String
+  bedroom     Int
+  bathroom    Int
+  latitude    String?     // Optional latitude coordinate
+  longitude   String?     // Optional longitude coordinate
+  type        Type        // Enum for post type (e.g., buy or rent)
+  property    Property    // Enum for property type (e.g., house, condo, etc.)
+  createdAt   DateTime    @default(now())
+  user        user    @relation(fields: [userId], references: [id]) // Relation to the User model
+  userId      String      @db.ObjectId
+  postDetail  postDetail? // Optional one-to-one relation with PostDetail
+    savedPosts savedPost[]
+}
+
+enum Type {
+  buy
+  rent
+}
+
+enum Property {
+  apartment
+  rent
+  house
+  condo
+  land
+}
+
+model postDetail {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  desc       String   
+  utilities  String   // Utilities available for the property
+  pet        String?  // Information about pet allowance (optional)
+  income     String?  // Income requirements or details (optional)
+  size       Int?     // Size of the property in square units (optional)
+  school     Int?     // Proximity to schools (optional)
+  bus        Int?     // Proximity to bus stops (optional)
+  restaurant  Int?     // Proximity to restaurants (optional)
+  
+  // Relation to the Post model
+  post       post     @relation(fields: [postId], references: [id])
+  postId     String   @db.ObjectId @unique
+}
+model savedPost{
+id         String   @id @default(auto()) @map("_id") @db.ObjectId
+user user    @relation(fields: [userId], references: [id])
+post   post    @relation(fields: [postId], references: [id])
+postId     String   @db.ObjectId @unique
+userId     String   @db.ObjectId @unique
+createdAt DateTime @default(now())
+@@unique([userId,postId])
+}
