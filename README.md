@@ -1,0 +1,1 @@
+This real estate platform allows users to browse and interact with property listings. Built with a Node.js backend, the platform leverages Prisma for seamless database management and interaction. The frontend is powered by React, providing a dynamic and responsive user interface.
